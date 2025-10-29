@@ -16,6 +16,9 @@ dependencies = [
     "scikit-learn",
     "tqdm",
     "joblib",
+    "torch>=2.9.0",
+    "pandas>=2.3.3",
+    "pytest>=8.3.5",
 ]
 authors = [
     {name = "Paul Hofman", email = "paul.hofman@ifi.lmu.de"},
