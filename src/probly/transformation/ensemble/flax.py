@@ -3,7 +3,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 
-
+#Ignore this function, due to the fact that the reset strategy is bad.
 # def reset_parameter(model: nnx.Module, rng_key): 
 #     """
 #     Reset all nnx.Param parameters in a given model using new random values.
