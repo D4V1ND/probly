@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import pytest
+from torch import nn
 
+from probly.layers.torch import DropConnectLinear
 from probly.transformation import dropconnect
 from tests.probly.torch_utils import count_layers
-from probly.layers.torch import DropConnectLinear
 
 torch = pytest.importorskip("torch")
 
-from torch import nn 
 
 class TestNetworkArchitectures:
     """Test class for different network architectures."""
@@ -29,12 +29,11 @@ class TestNetworkArchitectures:
             AssertionError: If the architecture of the model got changed unexpectedly or if an incorrect number of
             drop connect layers was inserted.
         """
-
         # P-Value for drop connect layer
         p = 0.5
         # transformed base model
         model = dropconnect(torch_model_small_2d_2d, p)
-        
+
         count_linear_original = count_layers(torch_model_small_2d_2d, nn.Linear)
         count_drop_connect_original = count_layers(torch_model_small_2d_2d, DropConnectLinear)
         count_sequential_original = count_layers(torch_model_small_2d_2d, nn.Sequential)
@@ -51,7 +50,7 @@ class TestNetworkArchitectures:
         assert count_sequential_original == count_sequential_modified
 
     def test_regression_network_1d(self, torch_regression_model_1d: nn.Sequential) -> None:
-        """Tests if every linear layer but the first in a linear regression model gets changed to a drop connect linear layer.
+        """Tests if every linear layer but the first in a linear regression model gets changed to a drop connect layer.
 
         This function verifies that:
         - Every linear layer but the first is exchanged for a linear drop connect layer.
@@ -64,7 +63,6 @@ class TestNetworkArchitectures:
             AssertionError: If the architecture of the model got changed unexpectedly or if an incorrect number of
             drop connect layers was inserted.
         """
-
         # P-Value for drop connect layer
         p = 0.5
         # transformed base model
@@ -86,8 +84,7 @@ class TestNetworkArchitectures:
         assert count_sequential_original == count_sequential_modified
 
     def test_regression_network_2d(self, torch_regression_model_2d: nn.Sequential) -> None:
-        """Tests a torch_regression_model_2d in the same way as the orch_regression_model_1d"""
-
+        """Tests a torch_regression_model_2d in the same way as the orch_regression_model_1d."""
         # P-Value for drop connect layer
         p = 0.5
         # transformed base model
@@ -109,7 +106,7 @@ class TestNetworkArchitectures:
         assert count_sequential_original == count_sequential_modified
 
     def test_custom_network(self, torch_custom_model: nn.Module) -> None:
-        """Tests the custom torch model"""
+        """Tests the custom torch model."""
         # P-Value for drop connect layer
         p = 0.5
         # transformed base model
@@ -120,17 +117,17 @@ class TestNetworkArchitectures:
 
 
 class TestPValues:
-    
+    """Test class for correct passing of p-values."""
+
     def test_linear_network_p_values(self, torch_model_small_2d_2d: nn.Sequential) -> None:
-        """Tests if the drop connect layers have the correct p-value assigned to them
-        
+        """Tests if the drop connect layers have the correct p-value assigned to them.
+
         Parameters:
             torch_model_small_2d_2d: The torch model to be tested for integration
 
         Raises:
             AssertionError: If the p-value in a Dropout layer does not match the expected value.
         """
-
         p = 0.5
         model = dropconnect(torch_model_small_2d_2d, p)
 
@@ -139,15 +136,14 @@ class TestPValues:
                 assert m.p == p
 
     def test_regression_network_1d_p_values(self, torch_regression_model_1d: nn.Sequential) -> None:
-        """Tests if the drop connect layers have the correct p-value assigned to them
-        
+        """Tests if the drop connect layers have the correct p-value assigned to them.
+
         Parameters:
             torch_regression_model_1d: The torch model to be tested for integration
 
         Raises:
             AssertionError: If the p-value in a Dropout layer does not match the expected value.
         """
-
         p = 0.5
         model = dropconnect(torch_regression_model_1d, p)
 
@@ -156,15 +152,14 @@ class TestPValues:
                 assert m.p == p
 
     def test_regression_network_2d_p_values(self, torch_regression_model_2d: nn.Sequential) -> None:
-        """Tests if the drop connect layers have the correct p-value assigned to them
-        
+        """Tests if the drop connect layers have the correct p-value assigned to them.
+
         Parameters:
             torch_regression_model_2d: The torch model to be tested for integration
 
         Raises:
             AssertionError: If the p-value in a Dropout layer does not match the expected value.
         """
-
         p = 0.5
         model = dropconnect(torch_regression_model_2d, p)
 
