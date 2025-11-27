@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class CalibratorBaseTorch(ABC):
-    """Abstract base class for calibrators."""
+    """Abstract base class for calibrators with torch."""
 
     def __init__(self, base_model: nn.Module, device: TorchDevice) -> None:
         """Create a calibrator.
@@ -31,4 +31,14 @@ class CalibratorBaseTorch(ABC):
     @abstractmethod
     def predict(self, x: Tensor) -> Tensor:
         """Return calibrated probabilities for input x."""
+        raise NotImplementedError
+
+
+"""WILL BE IMPLEMENTED LATER"""
+class CalibratorBaseFlax(ABC):
+    """Abstract base class for calibrators with flax."""
+
+    @abstractmethod
+    def fit(self, calibration_set: DataLoader) -> Self:
+        """Fit calibrator from calibration_set (DataLoader-like)."""
         raise NotImplementedError
