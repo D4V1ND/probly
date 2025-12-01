@@ -6,8 +6,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
-    from torch import Tensor, TorchDevice, nn
-    from torch.utils.data import DataLoader
+    from torch import Tensor, device as TorchDevice, nn
 
 
 class CalibratorBaseTorch(ABC):
@@ -24,7 +23,7 @@ class CalibratorBaseTorch(ABC):
         self.device = device
 
     @abstractmethod
-    def fit(self, calibration_set: DataLoader) -> Self:
+    def fit(self, calibration_set: Tensor, truth_labels: Tensor) -> Self:
         """Fit calibrator from calibration_set (DataLoader-like)."""
         raise NotImplementedError
 
@@ -39,6 +38,6 @@ class CalibratorBaseFlax(ABC):
     """Abstract base class for calibrators with flax."""
 
     @abstractmethod
-    def fit(self, calibration_set: DataLoader) -> Self:
+    def fit(self, calibration_set: Tensor) -> Self:
         """Fit calibrator from calibration_set (DataLoader-like)."""
         raise NotImplementedError
