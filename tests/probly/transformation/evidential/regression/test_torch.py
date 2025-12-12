@@ -2,22 +2,24 @@ from __future__ import annotations
 
 import pytest
 
+from probly.layers.torch import NormalInverseGammaLinear
 from probly.transformation.evidential.regression import evidential_regression
 from tests.probly.torch_utils import count_layers
-from probly.layers.torch import NormalInverseGammaLinear
 
 torch = pytest.importorskip("torch")
 
 from torch import nn  # noqa: E402
 
 
-
-
 class TestNetworkArchitectures:
     """Test class for different network architectures."""
 
-    @pytest.mark.parametrize('torch_regression_model_name',['torch_regression_model_1d', 'torch_regression_model_2d'])
-    def test_linear_network_with_last_linear(self, torch_regression_model_name, request) -> None:
+    @pytest.mark.parametrize("torch_regression_model_name", ["torch_regression_model_1d", "torch_regression_model_2d"])
+    def test_linear_network_with_last_linear(
+        self,
+        torch_regression_model_name: str,
+        request: pytest.FixtureRequest,
+    ) -> None:
         """Tests if a model incorporates a normal invers gamma layer correctly in exchange for the last linear layer.
 
         This function verifies that:
@@ -30,8 +32,8 @@ class TestNetworkArchitectures:
             torch_regression_model_1d: The torch model to be tested, specified as a sequential model.
 
         Raises:
-            AssertionError: If the structure of the model differs in an unexpected manner or if the normal invers gamma layer is not
-            inserted correctly after linear layers.
+            AssertionError: If the structure of the model differs in an unexpected manner or if the normal invers
+            gamma layer is not inserted correctly after linear layers.
         """
         torch_regression_model = request.getfixturevalue(torch_regression_model_name)
         model = evidential_regression(torch_regression_model)
@@ -64,13 +66,13 @@ class TestNetworkArchitectures:
         assert count_all_modules_original == count_all_modules_modified
 
         def count_linear_layers_until_nig(model: nn.Module) -> int:
-            s=0
+            s = 0
             for m in model.children():
                 if isinstance(m, nn.Linear):
-                    s+=1
+                    s += 1
                 if isinstance(m, NormalInverseGammaLinear):
                     return s
             return s
-        
-        #last layer to be nig
-        assert (count_linear_layers_until_nig(torch_regression_model)-1) == count_linear_layers_until_nig(model)
+
+        # last layer to be nig
+        assert (count_linear_layers_until_nig(torch_regression_model) - 1) == count_linear_layers_until_nig(model)
