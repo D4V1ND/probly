@@ -25,7 +25,7 @@ class IsotonicRegressionCalibrator:
         """
         self.model = base_model
         self.device = device
-        self.calibrator = None
+        self.calibrator: list[IsotonicRegression] = []
 
     def fit(self, calibration_set: DataLoader) -> None:
         """Fit the regression function to the model outputs.
@@ -43,7 +43,7 @@ class IsotonicRegressionCalibrator:
         self.classes_ = unique(labels_cal).cpu().numpy()
         num_classes = len(self.classes_)
 
-        if(num_classes <= 2):
+        if num_classes <= 2:
             pos_label = 1
             labels_bin = (labels_cal == pos_label).float()
 
@@ -52,11 +52,10 @@ class IsotonicRegressionCalibrator:
 
             iso_reg = IsotonicRegression(y_min=0.0, y_max=1.0, out_of_bounds="clip")
             iso_reg.fit(probabilities.numpy(), labels_bin.numpy())
-            self.calibrator = iso_reg
+            self.calibrator = [iso_reg]
 
         else:
             probabilities = softmax(logits_cal, dim=1).cpu().numpy()
-            self.calibrator = []
 
             for c in self.classes_:
                 iso_reg = IsotonicRegression(y_min=0.0, y_max=1.0, out_of_bounds="clip")
@@ -79,15 +78,16 @@ class IsotonicRegressionCalibrator:
             x = x.to(self.device)
             logits = self.model(x)
 
-            if(self.calibrator is None):
+            if self.calibrator is None:
                 calibrator_none_message = "Calibrator has not been fitted yet. Call fit method first."
                 raise RuntimeError(calibrator_none_message)
 
             # Case Multiclass model
-            if(isinstance(self.calibrator, list)):
+            if len(self.calibrator) > 1:
                 probabilities = softmax(logits, dim=1).cpu().numpy()
-                calibrated_probs = np.vstack([
-                    iso.predict(probabilities[:,c]) for c, iso in zip(self.classes_, self.calibrator, strict=False)]).T
+                calibrated_probs = np.vstack(
+                    [iso.predict(probabilities[:, c]) for c, iso in zip(self.classes_, self.calibrator, strict=False)],
+                ).T
 
                 calibrated_probs = calibrated_probs / calibrated_probs.sum(axis=1, keepdims=True)
                 return tensor(calibrated_probs, device=self.device)
@@ -95,7 +95,7 @@ class IsotonicRegressionCalibrator:
             # Case Binary Model
             scores = self._get_binary_scores(logits)
             probabilities = sigmoid(scores).cpu().numpy()
-            calibrated_probs = self.calibrator.predict(probabilities)
+            calibrated_probs = self.calibrator[0].predict(probabilities)
             calibrated_probs = np.stack([1 - calibrated_probs, calibrated_probs], axis=1)
             return tensor(calibrated_probs, device=self.device, dtype=logits.dtype)
 
@@ -116,13 +116,13 @@ class IsotonicRegressionCalibrator:
         return (cat(logits), cat(labels))
 
     def _get_binary_scores(self, logits: Tensor) -> Tensor:
-        if(logits.ndim == 1):
+        if logits.ndim == 1:
             return logits
 
-        if(logits.shape[1] == 1):
+        if logits.shape[1] == 1:
             return logits.squeeze()
 
-        if(logits.shape[1] == 2):
+        if logits.shape[1] == 2:
             return logits[:, 1]
 
         value_error_str = f"Binary Model should output shape (N,2), (N,1), (N,), not {tuple(logits.shape)}"
