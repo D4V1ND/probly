@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from probly.predictor import Predictor
+from probly.predictor import Predictor, predict
 from probly.transformation.evidential.regression.common import evidential_regression, register
 
 
@@ -10,7 +10,7 @@ def test_predict_method(dummy_predictor: Predictor) -> None:
     def simple_generator(base: Predictor) -> object:
         class Wrapper:
             def predict(self, x: object) -> object:
-                return base.predict(x)
+                return predict(base, x)
 
         return Wrapper()
 
