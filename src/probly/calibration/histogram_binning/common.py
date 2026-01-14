@@ -1,4 +1,6 @@
-from __future__ import annotations  # noqa: D100
+"""Common methods for BBQ Calibration."""
+
+from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 

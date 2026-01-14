@@ -19,7 +19,7 @@ class HistogramBinning(CalibratorBaseTorch):
         self.bin_start = 0.0
         self.bin_width = 0.0
         self.is_fitted = False
-        self.bin_probs: Tensor | None = None  # type: ignore  # noqa: PGH003
+        self.bin_probs: Tensor | None = None
 
     def fit(self, calibration_set: Tensor, truth_labels: Tensor) -> HistogramBinning:
         """Fit the histogram binning calibrator."""
