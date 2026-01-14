@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import torch
 from torch import Tensor, nn
 
+from probly.calibration.vector_scaling import common
 from probly.utils.torch import torch_collect_outputs
 
 if TYPE_CHECKING:
@@ -83,3 +84,8 @@ class TorchVectorScaling(nn.Module):
         with torch.no_grad():
             scaled_logits = self.forward(x)
             return torch.softmax(scaled_logits, dim=1)
+
+
+@common.register_vector_factory(nn.Module)
+def _(_base: nn.Module, _num_classes: int, _device: torch.device) -> type[TorchVectorScaling]:
+    return TorchVectorScaling
