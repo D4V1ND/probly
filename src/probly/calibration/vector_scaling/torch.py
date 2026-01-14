@@ -88,4 +88,4 @@ class TorchVectorScaling(nn.Module):
 
 @common.register_vector_factory(nn.Module)
 def _(_base: nn.Module, _num_classes: int, _device: torch.device) -> type[TorchVectorScaling]:
-    return TorchVectorScaling
+    return TorchVectorScaling(base=_base, num_classes=_num_classes, device=_device)
