@@ -4,20 +4,20 @@ from __future__ import annotations
 
 import torch
 from torch import Tensor, nn
-from torch.special import betaln
 
-from probly.calibration.template import CalibratorBaseTorch
+from probly.calibration.bayesian_binning.common import register_bayesian_binning_factory
+
+from .utils import betaln
 
 
-class BayesianBinningQuantiles(CalibratorBaseTorch):
+class BayesianBinningQuantiles:
     """Calibrator using Bayesian Binning into Quantiles (BBQ)."""
 
-    def __init__(self, max_bins: int = 10, device: torch.device = torch.device("cpu")) -> None:  # noqa: B008, D107
-        # Pass a dummy model if you don't need one
-        super().__init__(base_model=nn.Identity(), device=device)
+    def __init__(self, max_bins: int = 10) -> None:
+        """Pass a dummy model if you don't need one."""
         self.max_bins = max_bins
-        self.bin_edges: list[Tensor] = []  # type: ignore  # noqa: PGH003
-        self.system_bin_probs: list[Tensor] = []  # type: ignore  # noqa: PGH003
+        self.bin_edges: list[Tensor] = []
+        self.system_bin_probs: list[Tensor] = []
         self.system_scores: list[float] = []
         self.system_weights: list[float] = []
         self.is_fitted = False
@@ -69,7 +69,12 @@ class BayesianBinningQuantiles(CalibratorBaseTorch):
             for i in range(num_bins):
                 k = bin_positives[i].item()
                 n = bin_counts[i].item()
-                log_bin_scores[i] = betaln(k + 1, n - k + 1) - betaln(1, 1)  # log-space
+
+                # Convert to tensor with float dtype (and device if needed)
+                a = torch.tensor(k + 1, dtype=torch.float32)
+                b = torch.tensor(n - k + 1, dtype=torch.float32)
+
+                log_bin_scores[i] = betaln(a, b) - betaln(torch.tensor(1.0), torch.tensor(1.0))
 
             # System score = product of bin scores (in log-space)
             system_log_score = log_bin_scores.sum()
@@ -91,7 +96,7 @@ class BayesianBinningQuantiles(CalibratorBaseTorch):
         calibrated = torch.zeros_like(predictions, dtype=torch.float32)
 
         for i, pred in enumerate(predictions):
-            calibrated_prob = 0.0
+            calibrated_prob = torch.zeros((), dtype=torch.float32, device=pred.device)
             for sys_idx, edges in enumerate(self.bin_edges):
                 bin_probs = self.system_bin_probs[sys_idx]
                 weight = self.system_weights[sys_idx]
@@ -101,3 +106,8 @@ class BayesianBinningQuantiles(CalibratorBaseTorch):
             calibrated[i] = calibrated_prob
 
         return calibrated
+
+
+@register_bayesian_binning_factory(nn.Module)
+def _(_base: nn.Module, _device: object) -> type[BayesianBinningQuantiles]:
+    return BayesianBinningQuantiles

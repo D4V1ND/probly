@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from flax import nnx
 import jax.numpy as jnp
 from jax.scipy.special import betaln
 
+from probly.calibration.bayesian_binning.common import register_bayesian_binning_factory
 from probly.calibration.template import CalibratorBaseFlax
 
 if TYPE_CHECKING:
@@ -23,7 +25,7 @@ class BayesianBinningQuantiles(CalibratorBaseFlax):
         self.bin_edges: list[Array] = []
         self.system_bin_probs: list[Array] = []
 
-        self.system_scores: list[float] = []
+        self.system_scores: list[Array] = []
         self.system_weights: list[float] = []
 
         self.is_fitted = False
@@ -99,7 +101,7 @@ class BayesianBinningQuantiles(CalibratorBaseFlax):
 
         for i in range(predictions.shape[0]):
             pred = predictions[i]
-            calibrated_prob = 0.0
+            calibrated_prob = jnp.array(0.0)
 
             for sys_idx, edges in enumerate(self.bin_edges):
                 bin_probs = self.system_bin_probs[sys_idx]
@@ -113,3 +115,8 @@ class BayesianBinningQuantiles(CalibratorBaseFlax):
             calibrated = calibrated.at[i].set(calibrated_prob)
 
         return calibrated
+
+
+@register_bayesian_binning_factory(nnx.Module)
+def _(_base: nnx.Module, _device: object) -> type[BayesianBinningQuantiles]:
+    return BayesianBinningQuantiles

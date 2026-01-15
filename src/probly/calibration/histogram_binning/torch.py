@@ -9,7 +9,6 @@ from probly.calibration.histogram_binning.common import register_histogram_facto
 from probly.calibration.template import CalibratorBaseTorch
 
 
-@register_histogram_factory(nn.Module)
 class HistogramBinning(CalibratorBaseTorch):
     """Calibrator that uses histogram binning."""
 
@@ -82,3 +81,8 @@ class HistogramBinning(CalibratorBaseTorch):
             calibrated.append(self.bin_probs[bin_id])
 
         return Tensor(calibrated)
+
+
+@register_histogram_factory(nn.Module)
+def _(_base: nn.Module, _device: object) -> type[HistogramBinning]:
+    return HistogramBinning
