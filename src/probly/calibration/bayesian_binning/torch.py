@@ -36,7 +36,7 @@ class BayesianBinningQuantiles:
         self.bin_edges = []
 
         for num_bins in range(2, self.max_bins + 1):
-            # Quantile-based bin edges
+            # Quantile-based bin edges - bins have relatively equal numbers of elements
             edges = torch.quantile(calibration_set, torch.linspace(0, 1, num_bins + 1))
             edges[0] = 0.0
             edges[-1] = 1.0
