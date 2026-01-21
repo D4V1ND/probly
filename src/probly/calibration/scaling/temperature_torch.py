@@ -1,4 +1,5 @@
 """Temperature scaling extension of base."""
+
 from __future__ import annotations
 
 import torch

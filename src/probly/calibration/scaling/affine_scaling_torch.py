@@ -1,4 +1,5 @@
 """Platt- and Vectorscaling extension of base."""
+
 from __future__ import annotations
 
 import torch

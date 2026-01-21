@@ -11,6 +11,7 @@ import jax.numpy as jnp
 
 JaxDataLoader = Iterable[tuple[jax.Array, jax.Array]]
 
+
 class _ScalerFlax(nnx.Module, ABC):
     def __init__(self, base: nnx.Module, num_classes: int) -> None:
         super().__init__()
@@ -41,8 +42,7 @@ class _ScalerFlax(nnx.Module, ABC):
         """Loss function purely functional."""
         raise NotImplementedError
 
-    def _collect_logits_and_labels(
-        self, model: nnx.Module, dataset: JaxDataLoader) -> tuple[jax.Array, jax.Array]:
+    def _collect_logits_and_labels(self, model: nnx.Module, dataset: JaxDataLoader) -> tuple[jax.Array, jax.Array]:
         logits_list = []
         labels_list = []
 

@@ -1,4 +1,5 @@
 """Implementation For Platt-  and Vector Scaling Extension of Base."""
+
 from __future__ import annotations
 
 from flax import nnx
@@ -10,6 +11,7 @@ from .base_flax import _ScalerFlax
 
 class AffineScalingFlax(_ScalerFlax):
     """Wrapper Class for Platt- and Vectorscaling."""
+
     def __init__(self, base: nnx.Module, num_classes: int) -> None:
         """Initialize Wrapper with w and biases."""
         super().__init__(base, num_classes)
