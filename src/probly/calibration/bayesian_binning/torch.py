@@ -58,10 +58,7 @@ class BayesianBinningQuantiles:
             # Bayesian smoothed probabilities
             bin_probs = torch.zeros(num_bins, dtype=torch.float32)
             for i in range(num_bins):
-                if bin_counts[i] > 0:
-                    bin_probs[i] = (bin_positives[i].float() + 1.0) / (bin_counts[i].float() + 2.0)
-                else:
-                    bin_probs[i] = 0.5  # neutral for empty bins
+                bin_probs[i] = (bin_positives[i].float() + 1.0) / (bin_counts[i].float() + 2.0)
 
             self.system_bin_probs.append(bin_probs)
 
