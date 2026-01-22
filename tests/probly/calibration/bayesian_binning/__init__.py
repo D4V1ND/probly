@@ -1,1 +1,1 @@
-"""Tests for the Bayesian binning calibration method."""
+"""Tests for the Bayesian Binning calibration method."""

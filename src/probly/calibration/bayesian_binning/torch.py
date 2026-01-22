@@ -18,9 +18,10 @@ class BayesianBinningQuantiles:
         self.max_bins = max_bins
         self.bin_edges: list[Tensor] = []
         self.system_bin_probs: list[Tensor] = []
-        self.system_scores: list[float] = []
+        self.system_scores: list[Tensor] = []
         self.system_weights: list[float] = []
         self.is_fitted = False
+        self.system_log_scores: list[Tensor] = []
 
     def fit(self, calibration_set: Tensor, truth_labels: Tensor) -> BayesianBinningQuantiles:
         """Fit the BBQ calibrator."""
@@ -78,12 +79,12 @@ class BayesianBinningQuantiles:
 
             # System score = product of bin scores (in log-space)
             system_log_score = log_bin_scores.sum()
-            system_score = torch.exp(system_log_score).item()
-            self.system_scores.append(system_score)
+            self.system_scores.append(system_log_score)
 
         # Normalize system scores to weights
-        total_score = sum(self.system_scores)
-        self.system_weights = [s / total_score for s in self.system_scores]
+        log_scores = torch.stack(self.system_scores)  # Tensor shape (num_systems,)
+        weights = torch.softmax(log_scores, dim=0)
+        self.system_weights = weights.tolist()
         self.is_fitted = True
         return self
 
