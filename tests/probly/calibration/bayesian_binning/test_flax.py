@@ -17,7 +17,7 @@ class TestBayesianBinningQuantiles:
         """Ensure predict raises error if called before fit."""
         calibrator = BayesianBinningQuantiles(max_bins=5)
         test_predictions = jnp.array([0.1, 0.4, 0.6, 0, 8])
-        with pytest.raises(RuntimeError, match="calibrator must be fitted before prediction"):
+        with pytest.raises(RuntimeError, match="Calibrator must be fitted before prediction"):
             calibrator.predict(test_predictions)
 
     def test_tensors_shape_mismatch(self) -> None:
@@ -25,7 +25,7 @@ class TestBayesianBinningQuantiles:
         calibrator = BayesianBinningQuantiles(max_bins=5)
         calibration_set = jnp.array([0.1, 0.4, 0.6, 0.8])
         truth_labels = jnp.array([0, 1, 0])
-        with pytest.raises(ValueError, match="truth labels and the calibration set  must have the same length"):
+        with pytest.raises(ValueError, match="Calibration_set and truth_labels must have same length"):
             calibrator.fit(calibration_set, truth_labels)
 
     def test_empty_calibration_set(self) -> None:
@@ -33,7 +33,7 @@ class TestBayesianBinningQuantiles:
         calibrator = BayesianBinningQuantiles(max_bins=5)
         calibration_set = jnp.array([])
         truth_labels = jnp.array([])
-        with pytest.raises(ValueError, match="calibration_set cannot be empty"):
+        with pytest.raises(ValueError, match="Calibration_set cannot be empty"):
             calibrator.fit(calibration_set, truth_labels)
 
     def test_calibration_between_0_and_1(self) -> None:
