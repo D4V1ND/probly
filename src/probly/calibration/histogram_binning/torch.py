@@ -44,8 +44,7 @@ class HistogramBinning(CalibratorBaseTorch):
             bin_id = int((pred.item() - min_pre) / bin_width)
             # Test for the case where bin id is equal to n_bins, making it out of bounds MIGHT REMOVE LATER
             bin_id = max(0, min(bin_id, self.n_bins - 1))
-            if bin_id == self.n_bins:
-                bin_id = self.n_bins - 1
+
             bin_counts[bin_id] += 1
             bin_positives[bin_id] += int(label.item())
 
