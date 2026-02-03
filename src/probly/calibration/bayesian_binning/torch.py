@@ -79,7 +79,7 @@ class BayesianBinningQuantiles:
             self.system_scores.append(system_log_score)
 
         # Normalize system scores to weights
-        log_scores = torch.stack(self.system_scores)  # Tensor shape (num_systems,)
+        log_scores = torch.stack(self.system_scores)
         weights = torch.softmax(log_scores, dim=0)
         self.system_weights = weights.tolist()
         self.is_fitted = True
