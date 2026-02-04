@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="Calibration Metrics" href="calibration_metrics.html" /><link rel="prev" title="Utility Functions" href="../utilities_and_layers/utility_functions.html" />
+<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="next" title="An Introduction To Model Calibration With Probly" href="calibration_metrics.html" /><link rel="prev" title="Utility Functions" href="../utilities_and_layers/utility_functions.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
         <title>Evaluation and Quantification - probly 0.3.1 documentation</title>
@@ -232,7 +232,16 @@
 </ul>
 </li>
 <li class="toctree-l2 current has-children current-page"><a class="current reference internal" href="#">Evaluation and Quantification</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Evaluation and Quantification</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="calibration_metrics.html">Calibration Metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration_metrics.html">An Introduction To Model Calibration With Probly</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration_metrics.html#motivation-and-intuition">0. Motivation and Intuition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration_metrics.html#what-is-calibration">1. What is Calibration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration_metrics.html#calibration-with-probly">2. Calibration with Probly</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration_metrics.html#histogram-binning">3. Histogram Binning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration_metrics.html#temperature-scaling">4. Temperature Scaling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration_metrics.html#platt-scaling">5. Platt Scaling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration_metrics.html#vector-scaling">6. Vector Scaling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration_metrics.html#isotonic-regression">7. Isotonic Regression</a></li>
+<li class="toctree-l3"><a class="reference internal" href="calibration_metrics.html#bayesian-binning-into-quantiles-bbq">8. Bayesian Binning into Quantiles (BBQ)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="interpretation_techniques.html">Interpretation techniques</a></li>
 <li class="toctree-l3"><a class="reference internal" href="visualization_tools.html">Visualisation Tools</a></li>
 </ul>
@@ -253,6 +262,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../train_bnn_classification.html">Bayesian Neural Networks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train_evidential_classification.html">Evidential Model for Classification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../train_evidential_regression.html">Evidential Regression Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../transformations_comparison.html">Transformation Comparison: Dropout vs DropConnect vs Ensemble vs Bayesian vs Evidential (PyTorch)</a></li>
 </ul>
 </li>
 </ul>
@@ -298,7 +308,16 @@
 <h1>Evaluation and Quantification<a class="headerlink" href="#evaluation-and-quantification" title="Link to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="calibration_metrics.html">Calibration Metrics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_metrics.html">An Introduction To Model Calibration With Probly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_metrics.html#motivation-and-intuition">0. Motivation and Intuition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_metrics.html#what-is-calibration">1. What is Calibration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_metrics.html#calibration-with-probly">2. Calibration with Probly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_metrics.html#histogram-binning">3. Histogram Binning</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_metrics.html#temperature-scaling">4. Temperature Scaling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_metrics.html#platt-scaling">5. Platt Scaling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_metrics.html#vector-scaling">6. Vector Scaling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_metrics.html#isotonic-regression">7. Isotonic Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="calibration_metrics.html#bayesian-binning-into-quantiles-bbq">8. Bayesian Binning into Quantiles (BBQ)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="interpretation_techniques.html">Interpretation techniques</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization_tools.html">Visualisation Tools</a></li>
 </ul>
@@ -315,7 +334,7 @@
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Calibration Metrics</div>
+                <div class="title">An Introduction To Model Calibration With Probly</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

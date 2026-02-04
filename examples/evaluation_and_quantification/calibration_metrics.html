@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>probly Tutorial — Calibration Metrics - probly 0.3.1 documentation</title>
+        <title>An Introduction To Model Calibration With Probly - probly 0.3.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -185,7 +185,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -232,7 +232,16 @@
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/index.html">Evaluation and Quantification</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Evaluation and Quantification</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/calibration_metrics.html">Calibration Metrics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/calibration_metrics.html">An Introduction To Model Calibration With Probly</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/calibration_metrics.html#motivation-and-intuition">0. Motivation and Intuition</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/calibration_metrics.html#what-is-calibration">1. What is Calibration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/calibration_metrics.html#calibration-with-probly">2. Calibration with Probly</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/calibration_metrics.html#histogram-binning">3. Histogram Binning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/calibration_metrics.html#temperature-scaling">4. Temperature Scaling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/calibration_metrics.html#platt-scaling">5. Platt Scaling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/calibration_metrics.html#vector-scaling">6. Vector Scaling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/calibration_metrics.html#isotonic-regression">7. Isotonic Regression</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/calibration_metrics.html#bayesian-binning-into-quantiles-bbq">8. Bayesian Binning into Quantiles (BBQ)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/interpretation_techniques.html">Interpretation techniques</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../notebooks/examples/evaluation_and_quantification/visualization_tools.html">Visualisation Tools</a></li>
 </ul>
@@ -253,6 +262,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../notebooks/examples/train_bnn_classification.html">Bayesian Neural Networks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../notebooks/examples/train_evidential_classification.html">Evidential Model for Classification</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../notebooks/examples/train_evidential_regression.html">Evidential Regression Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/examples/transformations_comparison.html">Transformation Comparison: Dropout vs DropConnect vs Ensemble vs Bayesian vs Evidential (PyTorch)</a></li>
 </ul>
 </li>
 </ul>
@@ -288,17 +298,19 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="probly-tutorial-calibration-metrics">
-<h1><code class="docutils literal notranslate"><span class="pre">probly</span></code> Tutorial — Calibration Metrics<a class="headerlink" href="#probly-tutorial-calibration-metrics" title="Link to this heading">¶</a></h1>
-<p>The content and examples in this notebook are based on the paper <a class="reference external" href="https://arxiv.org/pdf/1706.04599">On Calibration of Modern Neural Networks (Guo et al., 2017)</a>.*</p>
-<section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+          <section id="an-introduction-to-model-calibration-with-probly">
+<h1>An Introduction To Model Calibration With Probly<a class="headerlink" href="#an-introduction-to-model-calibration-with-probly" title="Link to this heading">¶</a></h1>
+<p>This notebook is a short introduction to post-processing calibration of neural networks with Probly.<br />
+The content and examples in this notebook are based on the paper <a class="reference external" href="https://arxiv.org/pdf/1706.04599">On Calibration of Modern Neural Networks (Guo et al., 2017)</a>.*</p>
+</section>
+<section id="motivation-and-intuition">
+<h1>0. Motivation and Intuition<a class="headerlink" href="#motivation-and-intuition" title="Link to this heading">¶</a></h1>
 <p>In modern machine learning, we often train models that achieve very high accuracy.
 A deep neural network might classify an image as a “cat” and report a 99% confidence score from its softmax output.
 But what does that 99% confidence actually mean? Can we trust it?
@@ -314,9 +326,710 @@ where trusting an overconfident but wrong prediction can have serious consequenc
 <p>Fortunately, this miscalibration can be fixed after the model has been trained, using post-hoc calibration methods.
 These techniques adjust the model’s outputs to make its confidence scores more reliable without sacrificing its predictive accuracy.</p>
 <p>In this tutorial, we will explore the concepts introduced in that paper.
-We will learn how to measure a model’s calibration using Reliability Diagrams and then implement Temperature Scaling,
-a simple but highly effective technique to correct for overconfidence and make our models more trustworthy.</p>
-<p>TODO: expand notebook content based on the work of group #3</p>
+We will learn how to measure a model’s calibration using Reliability Diagrams and then implement Histogram Binning, Temperature Scaling, Platt Scaling, Vector Scaling, Isotonic Regression and Bayesian Binning into Quantiles, simple but highly effective technique to correct for overconfidence and make our models more trustworthy.</p>
+<p><img alt="Model Confidence" src="https://creatis-myriad.github.io/collections/images/calibration/reliability_histogram.jpg" /></p>
+<p>As you can see above models can be over or underconfident which means that they either overestimate or underestimate how accurate they are with their predictions.</p>
+<p>But it would be nice to have a good estimate of the accuracy via the confidence, especially in very sensitive areas like medicine or AI assisted driving…</p>
+</section>
+<section id="what-is-calibration">
+<h1>1. What is Calibration<a class="headerlink" href="#what-is-calibration" title="Link to this heading">¶</a></h1>
+<p>This is where calibration - and in this case post-processing calibration - comes in.<br />
+Calibration aims to push the confidence the model gives us to reflect the true accuracy for the inputs. So a perfectly calibrated model would give you a confidence and you would know that is also its accuracy.</p>
+<p>There are two major ways to do calibration on neural networks:</p>
+<ul class="simple">
+<li><p>In-training calibration</p></li>
+<li><p>Post-processing calibration</p></li>
+</ul>
+<p>In-training calibration methods would include certain loss functions like focal loss or a regularization method like dropout but we will focus on post-processing calibration since it can be applied to an already trained model withoud the need to modify or retrain it.</p>
+</section>
+<section id="calibration-with-probly">
+<h1>2. Calibration with Probly<a class="headerlink" href="#calibration-with-probly" title="Link to this heading">¶</a></h1>
+<p>Probly once again really simplifies the whole process by giving us the <code class="docutils literal notranslate"><span class="pre">Calibrator</span></code> classes for the various frameworks.<br />
+But to look at some calibrations we need something to calibrate in the first place, so lets define a model for that we can use. We will be using torch here, but other frameworks work just the same.</p>
+<section id="load-the-model">
+<h2>2.1 Load the model<a class="headerlink" href="#load-the-model" title="Link to this heading">¶</a></h2>
+<p>We are going to use the pretrained ResNet18 Model from Torchvision for simplicity.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">TensorDataset</span><span class="p">,</span> <span class="n">random_split</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torchvision</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResNet18_Weights</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torchvision.transforms</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">T</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda:0&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;mps&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">mps</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">net</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="n">ResNet18_Weights</span><span class="o">.</span><span class="n">IMAGENET1K_V1</span><span class="p">)</span>
+<span class="n">net</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">net</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="n">net_binary</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">resnet18</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="n">ResNet18_Weights</span><span class="o">.</span><span class="n">IMAGENET1K_V1</span><span class="p">)</span>
+<span class="n">net_binary</span><span class="o">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">net_binary</span> <span class="o">=</span> <span class="n">net_binary</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Using device: mps
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="load-the-data">
+<h2>2.2 Load the data<a class="headerlink" href="#load-the-data" title="Link to this heading">¶</a></h2>
+<p>Firstly, two datasets are loaded:</p>
+<ul class="simple">
+<li><p>Multi-class classification dataset with 10 classes (CIFAR-10)</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">transforms</span> <span class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">T</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">()])</span>
+
+<span class="n">train</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s2">&quot;~/datasets&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transforms</span><span class="p">)</span>
+<span class="n">train</span><span class="p">,</span> <span class="n">cal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">random_split</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">])</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">torchvision</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">CIFAR10</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s2">&quot;~/datasets&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transforms</span><span class="p">)</span>
+<span class="n">train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">cal_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">cal</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">test_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Binary classification dataset derived from CIFAR-10, using a single class as the positive class</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">binarize_dataset</span><span class="p">(</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>  <span class="c1"># an iterable of (image, label)</span>
+    <span class="n">positive_class</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>  <span class="c1"># returns (images, labels)</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">img</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+        <span class="n">images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">1.0</span> <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="n">positive_class</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">images</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>  <span class="c1"># shape: [N, C, H, W]</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">images</span><span class="p">,</span> <span class="n">labels</span>
+
+
+<span class="n">positive_class</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">x_train_full</span><span class="p">,</span> <span class="n">y_train_full</span> <span class="o">=</span> <span class="n">binarize_dataset</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">positive_class</span><span class="p">)</span>
+<span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">binarize_dataset</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">positive_class</span><span class="p">)</span>
+
+<span class="c1"># Split train</span>
+<span class="n">val_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_train_full</span><span class="p">))</span>
+<span class="n">train_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x_train_full</span><span class="p">)</span> <span class="o">-</span> <span class="n">val_size</span>
+
+<span class="n">train_dataset</span><span class="p">,</span> <span class="n">val_dataset</span> <span class="o">=</span> <span class="n">random_split</span><span class="p">(</span>
+    <span class="n">TensorDataset</span><span class="p">(</span><span class="n">x_train_full</span><span class="p">,</span> <span class="n">y_train_full</span><span class="p">),</span>
+    <span class="p">[</span><span class="n">train_size</span><span class="p">,</span> <span class="n">val_size</span><span class="p">],</span>
+    <span class="n">generator</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">42</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">64</span>
+
+<span class="n">train_loader_binary</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">val_loader_binary</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">val_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">test_loader_binary</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">TensorDataset</span><span class="p">(</span><span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">),</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="train-the-model">
+<h2>2.3 Train the model<a class="headerlink" href="#train-the-model" title="Link to this heading">¶</a></h2>
+<p>So let’s give the model a quick training session with our datasets.</p>
+<p><strong>Training the multi-class model:</strong><br />
+In this cell, we train a neural network to classify samples into <strong>10 classes</strong>. We use <code class="docutils literal notranslate"><span class="pre">CrossEntropyLoss</span></code> with the Adam optimizer, and print the running loss to monitor learning progress.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">epochs</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">)):</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+    <span class="n">running_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="ow">in</span> <span class="n">train_loader</span><span class="p">:</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">targets</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">running_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">, Running loss: </span><span class="si">{</span><span class="n">running_loss</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 20%|██        | 1/5 [00:14&lt;00:57, 14.36s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 1, Running loss: 0.9138334397297756
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 40%|████      | 2/5 [00:37&lt;00:58, 19.65s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 2, Running loss: 0.553833123415139
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 60%|██████    | 3/5 [01:01&lt;00:42, 21.48s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 3, Running loss: 0.4203897052130122
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 80%|████████  | 4/5 [01:26&lt;00:22, 22.89s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 4, Running loss: 0.32888528884975776
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 5/5 [01:51&lt;00:00, 22.31s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 5, Running loss: 0.2595443716094752
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Training the binary model:</strong><br />
+Here, we train a neural network for <strong>binary classification</strong>. The model outputs logits and is trained with <code class="docutils literal notranslate"><span class="pre">BCEWithLogitsLoss</span></code> and the Adam optimizer. Targets are converted to floats for compatibility, and the running loss is displayed for tracking training.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">epochs</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">net_binary</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BCEWithLogitsLoss</span><span class="p">()</span>
+
+<span class="n">best_val_loss</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">)):</span>
+    <span class="n">net_binary</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+    <span class="n">train_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="n">inputs_raw</span><span class="p">,</span> <span class="n">targets_raw</span> <span class="ow">in</span> <span class="n">train_loader_binary</span><span class="p">:</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="n">inputs_raw</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">targets_raw</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">net_binary</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">train_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">, Running loss: </span><span class="si">{</span><span class="n">train_loss</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 20%|██        | 1/5 [00:15&lt;01:02, 15.54s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 1, Running loss: 0.4265422675948424
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 40%|████      | 2/5 [00:30&lt;00:46, 15.44s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 2, Running loss: 0.2797004356268485
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 60%|██████    | 3/5 [00:46&lt;00:30, 15.39s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 3, Running loss: 0.21399176755184485
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> 80%|████████  | 4/5 [01:01&lt;00:15, 15.39s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 4, Running loss: 0.17655998633160094
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 5/5 [01:16&lt;00:00, 15.40s/it]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Epoch 5, Running loss: 0.1424452021879672
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="a-quick-look-at-the-model">
+<h2>2.4 A quick look at the model<a class="headerlink" href="#a-quick-look-at-the-model" title="Link to this heading">¶</a></h2>
+<p>For evaluation purposes probly gives us the function <code class="docutils literal notranslate"><span class="pre">expected_calibration_error()</span></code> to give us an idea of how uncalibrated the model really is.<br />
+Now that we have something to work with, lets take a quick look at the calibration error of the uncalibrated model…</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">probly.calibration.visualization.reliability_diagram</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_reliability_diagram</span><span class="p">,</span> <span class="n">plot_reliability_diagram</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">probly.evaluation.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">brier_score</span><span class="p">,</span> <span class="n">expected_calibration_error</span><span class="p">,</span> <span class="n">expected_calibration_error_binary</span>
+
+<span class="n">net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">inpt</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">test_loader</span><span class="p">):</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">outputs</span><span class="p">,</span> <span class="n">net</span><span class="p">(</span><span class="n">inpt</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">targets</span><span class="p">,</span> <span class="n">target</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">correct</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">targets</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="n">total</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">outputs_np</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">targets_np</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">ece</span> <span class="o">=</span> <span class="n">expected_calibration_error</span><span class="p">(</span><span class="n">outputs_np</span><span class="p">,</span> <span class="n">targets_np</span><span class="p">,</span> <span class="n">num_bins</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accuracy: </span><span class="si">{</span><span class="n">correct</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">total</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Calibration Error: </span><span class="si">{</span><span class="n">ece</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">brier_calibrated</span> <span class="o">=</span> <span class="n">brier_score</span><span class="p">(</span><span class="n">outputs_np</span><span class="p">,</span> <span class="n">targets_np</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Brier Score: </span><span class="si">{</span><span class="n">brier_calibrated</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">diagram</span> <span class="o">=</span> <span class="n">compute_reliability_diagram</span><span class="p">(</span><span class="n">outputs_np</span><span class="p">,</span> <span class="n">targets_np</span><span class="p">)</span>
+<span class="n">plot_reliability_diagram</span><span class="p">(</span><span class="n">diagram</span><span class="p">,</span> <span class="s2">&quot;Regular Model&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100%|██████████| 40/40 [00:01&lt;00:00, 26.18it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Accuracy: 0.7851
+Expected Calibration Error: 0.09587433145642277
+Brier Score: 0.32281142473220825
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 640x480 with 1 Axes&gt;,
+ &lt;Axes: title={&#39;center&#39;: &#39;Regular Model&#39;}, xlabel=&#39;Confidence&#39;, ylabel=&#39;Accuracy&#39;&gt;)
+</pre></div>
+</div>
+<img alt="../../_images/0160992a22c6af8b9708c4a363a8b514ddf4ae337e72a4e8a0060a75d552a26b.png" src="../../_images/0160992a22c6af8b9708c4a363a8b514ddf4ae337e72a4e8a0060a75d552a26b.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="histogram-binning">
+<h1>3. Histogram Binning<a class="headerlink" href="#histogram-binning" title="Link to this heading">¶</a></h1>
+<section id="what-is-histogram-binning">
+<h2>3.1 What is Histogram Binning?<a class="headerlink" href="#what-is-histogram-binning" title="Link to this heading">¶</a></h2>
+<p>Histogram Binning is a simple non-parametric calibration method, where all uncalibrated predictions are divided into mutually exclusive bins. Every bin gets a calibrated score assigned, so that if a prediction falls into bin A for example, the prediction would be “calibrated” to the calibrated score of bin A.</p>
+</section>
+<section id="histogram-binning-with-probly">
+<h2>3.2 Histogram Binning with Probly<a class="headerlink" href="#histogram-binning-with-probly" title="Link to this heading">¶</a></h2>
+<section id="here-s-how-we-can-implement-histogram-binning-with-probly">
+<h3>Here’s how we can implement Histogram Binning with probly<a class="headerlink" href="#here-s-how-we-can-implement-histogram-binning-with-probly" title="Link to this heading">¶</a></h3>
+<p>This code performs histogram binning calibration on a <strong>binary</strong> classification model.</p>
+<p>It first collects predicted probabilities and true labels from a validation dataset to fit a histogram binning calibrator, which partitions the probability space into bins and learns to adjust confidence estimates within each bin.</p>
+<p>The calibrated model probabilities are then computed on a separate test set, and the calibration quality is evaluated by computing the Expected Calibration Error (ECE) both before and after calibration.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">probly.calibration.histogram_binning.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">HistogramBinningTorch</span>
+
+<span class="n">net_binary</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">val_probs_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">val_targets_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="ow">in</span> <span class="n">val_loader_binary</span><span class="p">:</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">net_binary</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+        <span class="n">val_probs_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+        <span class="n">val_targets_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">targets</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+<span class="n">val_probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">val_probs_list</span><span class="p">)</span>
+<span class="n">val_targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">val_targets_list</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+
+<span class="n">calibrator</span> <span class="o">=</span> <span class="n">HistogramBinningTorch</span><span class="p">(</span><span class="n">n_bins</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">calibrator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">val_probs</span><span class="p">,</span> <span class="n">val_targets</span><span class="p">)</span>
+
+<span class="c1"># Evaluate on test set</span>
+<span class="n">all_targets</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_probs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_probs_before</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">net_binary</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">inpt</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">test_loader_binary</span><span class="p">:</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">net_binary</span><span class="p">(</span><span class="n">inpt</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+        <span class="n">all_probs_before</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+        <span class="n">all_probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calibrator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">cpu</span><span class="p">()))</span>
+        <span class="n">all_targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+<span class="n">all_probs_before</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_probs_before</span><span class="p">)</span>
+<span class="n">all_probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_probs</span><span class="p">)</span>
+<span class="n">all_targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_targets</span><span class="p">)</span>
+
+<span class="n">all_probs_before_np</span> <span class="o">=</span> <span class="n">all_probs_before</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">all_probs_np</span> <span class="o">=</span> <span class="n">all_probs</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">all_targets_np</span> <span class="o">=</span> <span class="n">all_targets</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+<span class="n">ece_before</span> <span class="o">=</span> <span class="n">expected_calibration_error_binary</span><span class="p">(</span><span class="n">all_probs_before_np</span><span class="p">,</span> <span class="n">all_targets_np</span><span class="p">)</span>
+<span class="n">ece_after</span> <span class="o">=</span> <span class="n">expected_calibration_error_binary</span><span class="p">(</span><span class="n">all_probs_np</span><span class="p">,</span> <span class="n">all_targets_np</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Calibration Error before Histogram Binning calibration: </span><span class="si">{</span><span class="n">ece_before</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Calibration Error after Histogram Binning calibration: </span><span class="si">{</span><span class="n">ece_after</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Expected Calibration Error before Histogram Binning calibration: 0.01029152430891989
+Expected Calibration Error after Histogram Binning calibration: 0.004423094099760012
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="temperature-scaling">
+<h1>4. Temperature Scaling<a class="headerlink" href="#temperature-scaling" title="Link to this heading">¶</a></h1>
+<section id="what-is-temperature-scaling">
+<h2>4.1 What is Temperature Scaling?<a class="headerlink" href="#what-is-temperature-scaling" title="Link to this heading">¶</a></h2>
+<p>Temperature scaling is a simple way to make a model’s confidence more honest. Many machine learning models, especially neural networks, are good at predicting the right class but tend to be too confident about their answers. Temperature scaling fixes this by slightly adjusting the model’s output probabilities after training. It does this by dividing the model’s raw scores by a value called the temperature, which can make the probabilities softer and less extreme. A higher temperature makes the model more cautious, while a lower one makes it more confident. The best temperature is learned using a validation set. Importantly, this process doesn’t change what the model predicts—it only makes the confidence behind those predictions more realistic and easier to trust.</p>
+</section>
+<section id="temperature-scaling-with-probly">
+<h2>4.2 Temperature Scaling with Probly<a class="headerlink" href="#temperature-scaling-with-probly" title="Link to this heading">¶</a></h2>
+<p>This code applies temperature scaling to calibrate a neural network’s predicted probabilities by learning a temperature parameter on a separate calibration dataset while keeping the model weights fixed. After calibration, the model generates probability predictions on the test set, which are then evaluated using Expected Calibration Error (ECE) to measure the gap between confidence and accuracy, and the Brier Score to assess overall probabilistic accuracy. Finally, a reliability diagram is plotted to visually show how well the model’s predicted confidence aligns with actual performance, where predictions closer to the diagonal indicate better calibration.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">probly.calibration.scaling.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">temperature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">probly.calibration.visualization.reliability_diagram</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_reliability_diagram</span><span class="p">,</span> <span class="n">plot_reliability_diagram</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">probly.evaluation.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">brier_score</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">temperature</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cal_loader</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="n">all_targets</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_probs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_probs_before</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">inpt</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">test_loader</span><span class="p">:</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">inpt</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">all_probs_before</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+        <span class="n">all_probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">inpt</span><span class="p">))</span>
+        <span class="n">all_targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+<span class="n">all_probs_before</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_probs_before</span><span class="p">)</span>
+<span class="n">all_probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_probs</span><span class="p">)</span>
+<span class="n">all_targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_targets</span><span class="p">)</span>
+<span class="n">all_probs_before_np</span> <span class="o">=</span> <span class="n">all_probs_before</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">all_probs_np</span> <span class="o">=</span> <span class="n">all_probs</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">all_targets_np</span> <span class="o">=</span> <span class="n">all_targets</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+<span class="n">ece_calibrated</span> <span class="o">=</span> <span class="n">expected_calibration_error</span><span class="p">(</span><span class="n">all_probs_np</span><span class="p">,</span> <span class="n">all_targets_np</span><span class="p">,</span> <span class="n">num_bins</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Calibration Error, after Temperature Scaling: </span><span class="si">{</span><span class="n">ece_calibrated</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">brier_calibrated</span> <span class="o">=</span> <span class="n">brier_score</span><span class="p">(</span><span class="n">all_probs_np</span><span class="p">,</span> <span class="n">all_targets_np</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Brier Score, after Temperature Scaling: </span><span class="si">{</span><span class="n">brier_calibrated</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">diagram</span> <span class="o">=</span> <span class="n">compute_reliability_diagram</span><span class="p">(</span><span class="n">all_probs_np</span><span class="p">,</span> <span class="n">all_targets_np</span><span class="p">)</span>
+<span class="n">plot_reliability_diagram</span><span class="p">(</span><span class="n">diagram</span><span class="p">,</span> <span class="s2">&quot;Temperature Scaling&quot;</span><span class="p">)</span>
+<span class="n">diagram_before</span> <span class="o">=</span> <span class="n">compute_reliability_diagram</span><span class="p">(</span><span class="n">all_probs_before_np</span><span class="p">,</span> <span class="n">all_targets_np</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Batches: 100%|██████████| 40/40 [00:01&lt;00:00, 27.87it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Expected Calibration Error, after Temperature Scaling: 0.05636034853607415
+Brier Score, after Temperature Scaling: 0.3106227219104767
+</pre></div>
+</div>
+<img alt="../../_images/a6196f740711767f9812ae61cdaa44f9d1261e82839be9d94ab52d8059337f48.png" src="../../_images/a6196f740711767f9812ae61cdaa44f9d1261e82839be9d94ab52d8059337f48.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="platt-scaling">
+<h1>5. Platt Scaling<a class="headerlink" href="#platt-scaling" title="Link to this heading">¶</a></h1>
+<section id="what-is-platt-scaling">
+<h2>5.1 What is Platt Scaling?<a class="headerlink" href="#what-is-platt-scaling" title="Link to this heading">¶</a></h2>
+<p>Platt scaling is a probability calibration technique used in machine learning to transform a classifier’s raw output scores into well-calibrated probability estimates for binary classification problems. It fits a logistic (sigmoid) function to the model’s predictions using a separate validation dataset, learning parameters that align predicted probabilities with observed class frequencies. This approach is commonly applied to models such as Support Vector Machines, which produce decision scores that are effective for ranking but not directly interpretable as probabilities.</p>
+</section>
+<section id="plat-scaling-with-probly">
+<h2>5.2 Plat Scaling with Probly<a class="headerlink" href="#plat-scaling-with-probly" title="Link to this heading">¶</a></h2>
+<p>This code applies TorchAffine calibration to the binary model. The calibration is fitted on the validation set, and we collect predicted probabilities before and after calibration on the test set. Probabilities and true labels are stored as NumPy arrays for ECE evaluation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">probly.calibration.scaling.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">platt</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">platt</span><span class="p">(</span><span class="n">net_binary</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">val_loader_binary</span><span class="p">)</span>
+
+<span class="n">all_targets</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_probs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_probs_before</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">net_binary</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">inpt</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">test_loader_binary</span><span class="p">:</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">net_binary</span><span class="p">(</span><span class="n">inpt</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+        <span class="n">all_probs_before</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+        <span class="n">all_probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">inpt</span><span class="p">))</span>
+        <span class="n">all_targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+<span class="n">all_probs_before</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_probs_before</span><span class="p">)</span>
+<span class="n">all_probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_probs</span><span class="p">)</span>
+<span class="n">all_targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_targets</span><span class="p">)</span>
+
+<span class="n">all_probs_before_np</span> <span class="o">=</span> <span class="n">all_probs_before</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">all_probs_np</span> <span class="o">=</span> <span class="n">all_probs</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">all_targets_np</span> <span class="o">=</span> <span class="n">all_targets</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+<span class="n">ece_before</span> <span class="o">=</span> <span class="n">expected_calibration_error_binary</span><span class="p">(</span><span class="n">all_probs_before_np</span><span class="p">,</span> <span class="n">all_targets_np</span><span class="p">)</span>
+<span class="n">ece_after</span> <span class="o">=</span> <span class="n">expected_calibration_error_binary</span><span class="p">(</span><span class="n">all_probs_np</span><span class="p">,</span> <span class="n">all_targets_np</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Calibration Error before Platt Scaling calibration: </span><span class="si">{</span><span class="n">ece_before</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Calibration Error after Platt Scaling calibration: </span><span class="si">{</span><span class="n">ece_after</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Batches: 100%|██████████| 125/125 [00:02&lt;00:00, 61.03it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Expected Calibration Error before Platt Scaling calibration: 0.01029152430891989
+Expected Calibration Error after Platt Scaling calibration: 0.009315006518363984
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="vector-scaling">
+<h1>6. Vector Scaling<a class="headerlink" href="#vector-scaling" title="Link to this heading">¶</a></h1>
+<section id="what-is-vector-scaling">
+<h2>6.1 What is Vector Scaling?<a class="headerlink" href="#what-is-vector-scaling" title="Link to this heading">¶</a></h2>
+<p>Vector Scaling is an extension of Platt scaling for multi-class problems. It applies a learned scale and bias to each class’s logits, improving calibration so the predicted probabilities better match the true class frequencies.</p>
+</section>
+<section id="vector-scaling-with-probly">
+<h2>6.2 Vector Scaling with Probly<a class="headerlink" href="#vector-scaling-with-probly" title="Link to this heading">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">probly.calibration.scaling.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">vector</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">vector</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cal_loader</span><span class="p">)</span>
+
+<span class="n">all_targets</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_probs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_probs_before</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">net</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">inpt</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">test_loader</span><span class="p">:</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">net</span><span class="p">(</span><span class="n">inpt</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+        <span class="n">all_probs_before</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+        <span class="n">all_probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">inpt</span><span class="p">))</span>
+        <span class="n">all_targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+<span class="n">all_probs_before</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_probs_before</span><span class="p">)</span>
+<span class="n">all_probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_probs</span><span class="p">)</span>
+<span class="n">all_targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_targets</span><span class="p">)</span>
+
+<span class="n">all_probs_before_np</span> <span class="o">=</span> <span class="n">all_probs_before</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">all_probs_np</span> <span class="o">=</span> <span class="n">all_probs</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">all_targets_np</span> <span class="o">=</span> <span class="n">all_targets</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+<span class="n">ece_calibrated</span> <span class="o">=</span> <span class="n">expected_calibration_error</span><span class="p">(</span><span class="n">all_probs_np</span><span class="p">,</span> <span class="n">all_targets_np</span><span class="p">,</span> <span class="n">num_bins</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Calibration Error, after Temperature Scaling: </span><span class="si">{</span><span class="n">ece_calibrated</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">brier_calibrated</span> <span class="o">=</span> <span class="n">brier_score</span><span class="p">(</span><span class="n">all_probs_np</span><span class="p">,</span> <span class="n">all_targets_np</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Brier Score, after Temperature Scaling: </span><span class="si">{</span><span class="n">brier_calibrated</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">diagram_vector</span> <span class="o">=</span> <span class="n">compute_reliability_diagram</span><span class="p">(</span><span class="n">all_probs_np</span><span class="p">,</span> <span class="n">all_targets_np</span><span class="p">)</span>
+<span class="n">plot_reliability_diagram</span><span class="p">(</span><span class="n">diagram_vector</span><span class="p">,</span> <span class="s2">&quot;Vector Scaling&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Batches: 100%|██████████| 40/40 [00:01&lt;00:00, 27.92it/s]
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Expected Calibration Error, after Temperature Scaling: 0.05221195326149463
+Brier Score, after Temperature Scaling: 0.29244285821914673
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 640x480 with 1 Axes&gt;,
+ &lt;Axes: title={&#39;center&#39;: &#39;Vector Scaling&#39;}, xlabel=&#39;Confidence&#39;, ylabel=&#39;Accuracy&#39;&gt;)
+</pre></div>
+</div>
+<img alt="../../_images/71201727a2c7fc885e7b90ed12ce98409b86b14eb96f5f88f6bffb3a735f2f52.png" src="../../_images/71201727a2c7fc885e7b90ed12ce98409b86b14eb96f5f88f6bffb3a735f2f52.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="isotonic-regression">
+<h1>7. Isotonic Regression<a class="headerlink" href="#isotonic-regression" title="Link to this heading">¶</a></h1>
+<section id="what-is-isotonic-regression">
+<h2>7.1 What is Isotonic Regression?<a class="headerlink" href="#what-is-isotonic-regression" title="Link to this heading">¶</a></h2>
+<p>Isotonic Regression is one of the most common non-parametric post-processing calibration methods. It learns a piecewise constant function to transform uncalibrated model outputs and aims to minimize the square loss.<br />
+It can be seen as a strict generalization of histogram binning.</p>
+</section>
+<section id="isotonic-regression-with-probly">
+<h2>7.2 Isotonic Regression with Probly<a class="headerlink" href="#isotonic-regression-with-probly" title="Link to this heading">¶</a></h2>
+<p>Let’s calibrate our base model with probly’s isotonic regression and again, compare it to the base model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">probly.calibration.isotonic_regression.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">isotonic_regression</span>
+
+<span class="n">isotonic_regression_cal</span> <span class="o">=</span> <span class="n">isotonic_regression</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">use_logits</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">isotonic_regression_cal</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cal_loader</span><span class="p">)</span>
+
+<span class="n">cal_probs_isotonic</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">labels_isotonic</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">x_to_device</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">test_loader</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x_to_device</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">isotonic_regression_cal</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">cal_probs_isotonic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+        <span class="n">labels_isotonic</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+<span class="n">cal_probs_isotonic</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">cal_probs_isotonic</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">all_labels_isotonic</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">labels_isotonic</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+<span class="n">ece_calibrated_isotonic</span> <span class="o">=</span> <span class="n">expected_calibration_error</span><span class="p">(</span><span class="n">cal_probs_isotonic</span><span class="p">,</span> <span class="n">all_labels_isotonic</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Calibration Error after Isotonic Regression: </span><span class="si">{</span><span class="n">ece_calibrated_isotonic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">brier_calibrated_isotonic</span> <span class="o">=</span> <span class="n">brier_score</span><span class="p">(</span><span class="n">cal_probs_isotonic</span><span class="p">,</span> <span class="n">all_labels_isotonic</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Brier Score after Isotonic Regression: </span><span class="si">{</span><span class="n">brier_calibrated_isotonic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">diagram_isotonic</span> <span class="o">=</span> <span class="n">compute_reliability_diagram</span><span class="p">(</span><span class="n">cal_probs_isotonic</span><span class="p">,</span> <span class="n">all_labels_isotonic</span><span class="p">)</span>
+<span class="n">plot_reliability_diagram</span><span class="p">(</span><span class="n">diagram_isotonic</span><span class="p">,</span> <span class="s2">&quot;Isotonic Regression&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">NotImplementedError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">12</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">from</span><span class="w"> </span><span class="nn">probly.calibration.isotonic_regression.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">isotonic_regression</span>
+<span class="ne">----&gt; </span><span class="mi">3</span> <span class="n">isotonic_regression_cal</span> <span class="o">=</span> <span class="n">isotonic_regression</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">use_logits</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">isotonic_regression_cal</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cal_loader</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="n">cal_probs_isotonic</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="nn">File ~/Docs/probly/src/probly/calibration/isotonic_regression/common.py:28,</span> in <span class="ni">isotonic_regression</span><span class="nt">(base, use_logits)</span>
+<span class="g g-Whitespace">     </span><span class="mi">26</span> <span class="k">def</span><span class="w"> </span><span class="nf">isotonic_regression</span><span class="p">(</span><span class="n">base</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">use_logits</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">27</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;Dispatches different implementations for isotonic regression.&quot;&quot;&quot;</span>
+<span class="ne">---&gt; </span><span class="mi">28</span>     <span class="k">return</span> <span class="n">_isotonic_factory</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">use_logits</span><span class="p">)</span>
+
+<span class="nn">File ~/Docs/probly/src/lazy_dispatch/singledispatch.py:201,</span> in <span class="ni">lazydispatch.__call__</span><span class="nt">(self, *args, **kwargs)</span>
+<span class="g g-Whitespace">    </span><span class="mi">199</span>     <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">funcname</span><span class="si">}</span><span class="s2"> requires at least 1 positional argument&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">200</span>     <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">201</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dispatch_on</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="nn">File ~/Docs/probly/src/probly/calibration/isotonic_regression/common.py:18,</span> in <span class="ni">_isotonic_factory</span><span class="nt">(base_model, use_logits)</span>
+<span class="g g-Whitespace">     </span><span class="mi">15</span> <span class="nd">@lazydispatch</span>
+<span class="g g-Whitespace">     </span><span class="mi">16</span> <span class="k">def</span><span class="w"> </span><span class="nf">_isotonic_factory</span><span class="p">(</span><span class="n">base_model</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span> <span class="n">use_logits</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="g g-Whitespace">     </span><span class="mi">17</span>     <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;No Isotonic Regression implementation for base=</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">base_model</span><span class="p">)</span><span class="si">}</span><span class="s2">, use_logits=</span><span class="si">{</span><span class="n">use_logits</span><span class="si">}</span><span class="s2">.&quot;</span>
+<span class="ne">---&gt; </span><span class="mi">18</span>     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+<span class="ne">NotImplementedError</span>: No Isotonic Regression implementation for base=&lt;class &#39;torchvision.models.resnet.ResNet&#39;&gt;, use_logits=False.
+</pre></div>
+</div>
+</div>
+</div>
+<p>As we can see, the isotonic regression calibrated the models outputs and the brier score should have decreased. The ECE might not necessarily decrease since isotonic regression can over fit and thus slightly increase the ECE.</p>
+</section>
+</section>
+<section id="bayesian-binning-into-quantiles-bbq">
+<h1>8. Bayesian Binning into Quantiles (BBQ)<a class="headerlink" href="#bayesian-binning-into-quantiles-bbq" title="Link to this heading">¶</a></h1>
+<section id="what-is-bbq">
+<h2>8.1 What is BBQ?<a class="headerlink" href="#what-is-bbq" title="Link to this heading">¶</a></h2>
+<p>Bayesian Binning Quantiles is an advanced non-parametric calibration method that improves upon simple histogram binning, by curbing its biggest weakness - <strong>the result of calibration is heavily dependant on the initial choice of the number of bins.</strong></p>
+<p>Bayesian Binning solves this by trying many different ways of binning, up to an arbitrary number of bins, and averages by doing Bayesian averaging. After that it assigns <strong>a score (a kind of likelihood)</strong> to each bin amount, based on how well it fits the calibration data. Finally, it combines the predictions from all these binnings, weighting each by its score, to produce a more reliable calibrated output.</p>
+</section>
+<section id="bbq-with-probly">
+<h2>8.2 BBQ with Probly<a class="headerlink" href="#bbq-with-probly" title="Link to this heading">¶</a></h2>
+<section id="here-s-how-we-can-implement-bbq-calibration-with-probly">
+<h3>Here’s how we can implement BBQ Calibration with probly<a class="headerlink" href="#here-s-how-we-can-implement-bbq-calibration-with-probly" title="Link to this heading">¶</a></h3>
+<p>This code performs BBQ calibration on a <strong>binary</strong> classification model.</p>
+<p>It first collects predicted probabilities and true labels from a validation dataset to fit a Bayesian binning calibrator, which considers multiple binning schemes <strong>(from 2 to max_bins)</strong> and uses Bayesian model averaging to weight each scheme according to its marginal likelihood.</p>
+<p>The calibrated model probabilities are then computed on a separate test set, and the calibration quality is evaluated by computing the Expected Calibration Error (ECE) both before and after calibration.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">probly.calibration.bayesian_binning.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">BayesianBinningQuantilesTorch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">probly.evaluation.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">expected_calibration_error_binary</span>
+
+<span class="c1"># Fit the calibrator on validation set</span>
+<span class="n">net_binary</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">val_probs_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">val_targets_list</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="ow">in</span> <span class="n">val_loader_binary</span><span class="p">:</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">net_binary</span><span class="p">(</span><span class="n">inputs</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+        <span class="n">val_probs_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+        <span class="n">val_targets_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">targets</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+<span class="n">val_probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">val_probs_list</span><span class="p">)</span>
+<span class="n">val_targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">val_targets_list</span><span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+
+<span class="n">calibrator</span> <span class="o">=</span> <span class="n">BayesianBinningQuantilesTorch</span><span class="p">(</span><span class="n">max_bins</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">calibrator</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">val_probs</span><span class="p">,</span> <span class="n">val_targets</span><span class="p">)</span>
+
+<span class="c1"># Evaluate on test set</span>
+<span class="n">all_targets</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_probs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_probs_before</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">net_binary</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">inpt</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">test_loader_binary</span><span class="p">:</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">net_binary</span><span class="p">(</span><span class="n">inpt</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">))</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+        <span class="n">all_probs_before</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">cpu</span><span class="p">())</span>
+
+        <span class="n">all_probs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">calibrator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">probs</span><span class="o">.</span><span class="n">cpu</span><span class="p">()))</span>
+        <span class="n">all_targets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+<span class="n">all_probs_before</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_probs_before</span><span class="p">)</span>
+<span class="n">all_probs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_probs</span><span class="p">)</span>
+<span class="n">all_targets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_targets</span><span class="p">)</span>
+
+<span class="n">all_probs_before_np</span> <span class="o">=</span> <span class="n">all_probs_before</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">all_probs_np</span> <span class="o">=</span> <span class="n">all_probs</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+<span class="n">all_targets_np</span> <span class="o">=</span> <span class="n">all_targets</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+<span class="n">ece_before</span> <span class="o">=</span> <span class="n">expected_calibration_error_binary</span><span class="p">(</span><span class="n">all_probs_before_np</span><span class="p">,</span> <span class="n">all_targets_np</span><span class="p">)</span>
+<span class="n">ece_after</span> <span class="o">=</span> <span class="n">expected_calibration_error_binary</span><span class="p">(</span><span class="n">all_probs_np</span><span class="p">,</span> <span class="n">all_targets_np</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Calibration Error before BBQ calibration: </span><span class="si">{</span><span class="n">ece_before</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Calibration Error after BBQ calibration: </span><span class="si">{</span><span class="n">ece_after</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Expected Calibration Error before BBQ calibration: 0.0103
+Expected Calibration Error after BBQ calibration: 0.0050
+</pre></div>
+</div>
+</div>
+</div>
+</section>
 </section>
 </section>
 
@@ -345,27 +1058,8 @@ a simple but highly effective technique to correct for overconfidence and make o
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">probly</span></code> Tutorial — Calibration Metrics</a><ul>
-<li><a class="reference internal" href="#introduction">Introduction</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>
